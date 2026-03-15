@@ -5,15 +5,18 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring2.springdos.model.usuario;
 
 @RestController
+@RequestMapping("/usuarios")
 public class usuarioController {
 
     @SuppressWarnings("FieldMayBeFinal")
@@ -25,12 +28,12 @@ public class usuarioController {
         new usuario(5, "Luis", "luis@example.com", "password345", "3344556677")
     ));
 
-    @GetMapping("/getUsuarios")
+    @GetMapping
     public List<usuario> getUsuarios() {
         return usuarios;
     }
 
-    @GetMapping("/getUsuario/{id}")
+    @GetMapping("/{id}")
     public usuario getUsuario(@PathVariable String id) {
         return usuarios.stream()
                 .filter(u -> u.getId() == Integer.parseInt(id))
@@ -38,13 +41,13 @@ public class usuarioController {
                 .orElse(null);
     }
     
-    @PostMapping("/postUsuario")
-    public usuario postUsuario(usuario user) {
+    @PostMapping
+    public usuario postUsuario(@RequestBody usuario user) {
         usuarios.add(user);
         return user;
     }
 
-    @PutMapping("/putUsuario/{id}")
+    @PutMapping("/{id}")
     public usuario putUsuario(@PathVariable String id, @RequestBody usuario user) {
         usuario existingUser = getUsuario(id);
         if (existingUser != null) {
@@ -56,9 +59,29 @@ public class usuarioController {
         return existingUser;
     }
 
-    @DeleteMapping("/deleteUsuario/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUsuario(@PathVariable String id) {
         usuarios.removeIf(u -> u.getId() == Integer.parseInt(id));
+    }
+
+    @PatchMapping("/{id}")
+    public usuario patchUsuario(@PathVariable String id, @RequestBody usuario user) {
+        usuario existingUser = getUsuario(id);
+        if (existingUser != null) {
+            if (user.getNombre() != null) {
+                existingUser.setNombre(user.getNombre());
+            }
+            if (user.getEmail() != null) {
+                existingUser.setEmail(user.getEmail());
+            }
+            if (user.getPassword() != null) {
+                existingUser.setPassword(user.getPassword());
+            }
+            if (user.getNumeroTelefono() != null) {
+                existingUser.setNumeroTelefono(user.getNumeroTelefono());
+            }
+        }
+        return existingUser;
     }
 
     public void setUsuarios(List<usuario> usuarios) {
